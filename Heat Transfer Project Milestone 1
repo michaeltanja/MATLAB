@@ -1,0 +1,173 @@
+
+clear all
+close all
+
+%%
+%parameters and
+%mesh properties
+
+NperRow = 75; % Nodes per row
+NperCol = 75; % Nodes per column
+nNodes = NperRow * NperCol;
+
+L  = 2;         %unsure about what this does, but it was in the example
+W  = 2;         %unsure about what this does, but it was in the example
+dx = L/(NperRow - 1);
+qx = 100000;    %heat flux bottom
+qy = 65000;     %heat flux side
+
+k  = 250;       %conduction coefficient
+h  = 250;       %convection coefficient
+Tinf = 0;       %fluid temp in celsius
+
+
+
+%next in line is node set up
+%% 
+% Center Node/s
+
+for ii = NperRow+2 : (NperRow^2) - (NperRow+1) %put this first in order, matlab reads top down
+    
+    A(ii, ii+NperRow) = 1; %upper
+    A(ii, ii-NperRow) = 1; %lower
+    A(ii, ii+1) = 1;       %right
+    A(ii, ii-1) = 1;       %left
+    A(ii, ii) = -4;        %center
+    b(ii) = 0;             %boundary
+end
+
+%%
+% Convection node/s on the right
+
+for ii = 2*NperRow : NperRow : (NperRow^2) - NperRow              %needs to be more generalized
+    A(ii, ii+NperRow) = 1;       %upper
+    A(ii, ii-NperRow) = 1;       %lower
+                                 %no right
+    A(ii, ii-1) = 2;             %left
+    A(ii, ii) = (-2)*((h*dx)+2); %center
+    b(ii) = ((2*h*dx)/k)*Tinf;   %boundary
+end
+
+%% 
+% Convection node/s on top
+for ii = (NperRow*NperCol)-(NperRow - 2) : (NperRow^2 -1) %generalized
+                                                          %no top term
+    A(ii, ii-NperRow) = 2;                                %lower
+    A(ii, ii+1) = 1;                                      %right 
+    A(ii, ii-1) = 1;                                      %left
+    A(ii, ii) = (-2)*(((h*dx)/k) + 2);                    %center
+    b(ii) = (2*h*dx*Tinf)/k;                              %boundary
+end
+
+%starting corners 1-4
+%%
+% Corner 1 (this boundary condition should have same initiation
+%   for any matrix size)
+for ii = (NperCol*NperRow)-(NperRow-1)     %generalized
+                                           %no top term 
+    A(ii, ii-NperRow) = 1;                 %lower
+    A(ii, ii+1) = 1;                       %right 
+                                           %no left term
+    A(ii,ii) = (-1)*(((h*dx)/k) +2);       %center
+    b(ii) = ((h*dx*Tinf)/k) + ((qy*dx)/k); %boundary
+                       %EDIT: change flow of heat on boundary condition
+end
+
+%%
+% Corner 2 (This shouldn't change either)
+
+for ii = NperRow*NperCol
+                                     %no top term
+    A(ii, ii-NperRow) = 1;           %lower term
+                                     %no right term
+    A(ii, ii-1) = 1;                 %left
+    A(ii, ii) = ((-2*h*dx)/(k)) - 1; %center
+    b(ii) = (2*h*dx)/k;              %boundary
+end
+
+%%
+% Corner 3 (should stay the same for all meshes)
+
+for ii = 1
+    A(ii, ii+NperRow) = 1;  %upper
+                            %no lower
+    A(ii, ii+1) = 1;        %right
+                            %no left term
+    A(ii, ii) = -2;         %center
+    b(ii) = ((dx/k)*(qy+qx)); %boundary
+               %EDIT: Changed flow of heat on the boundary condition
+end
+
+%%
+% Corner 4 (should be the same for all matrices)
+
+for ii = NperRow
+    A(ii, ii+NperRow) = 1;                 %upper
+                                           %no lower term
+                                           %no right term
+    A(ii, ii-1) = 1;                       %left term
+    A(ii,ii) = -2-((h*dx)/k);              %center
+    b(ii) = ((h*dx*Tinf)/k) + ((qx*dx)/2); %boundary
+end
+
+%corners are finished
+%Start heat sources
+%%
+%heat source left side
+
+for ii = NperRow+1 : NperRow : (NperRow^2)-(NperRow+1)                 %try to generalize for all matrices
+    A(ii, ii+NperRow) = 1; %upper
+    A(ii, ii-NperRow) = 1; %lower
+    A(ii, ii+1) = 2;       %right
+                           %no left term
+    A(ii, ii) = -4;        %center
+    b(ii) = (2*(qy)*dx)/k;   %boundary
+             %EDIT: Changed flow of heat on the boundary condition, for qy
+end
+
+%%
+%heat source bottom
+
+for ii = 2: (NperRow-1)    %generalized
+    A(ii, ii+NperRow) = 2; %upper
+                           %no lower term
+    A(ii, ii+1) = 1;       %right term
+    A(ii, ii-1) = 1;       %left term
+    A(ii, ii) = -4;        %center
+    b(ii) = (2*qy*dx)/k;   %boundary
+end
+
+%%
+%Matrices are all set up, should be able to solve and graph now
+v = b'; %turned array into vector to make dimensions agree
+T = A\v;
+
+%%
+%creating the mesh plot 
+
+x = [0: dx :L]; %x-axis grid
+y = [0: dx :W]; %y-axis grid
+
+[X,Y] = meshgrid(x,y);
+%Create a loop that converts the vector back into a mesh to plot
+%takes the temperature vector and reorganizes into a matrix
+
+nIndex = 1; %this index will count down the temperature
+for aa = 1:nNodes/NperRow
+    for bb = 1:NperRow
+        TMesh(aa,bb) = T(nIndex);
+        nIndex = nIndex +1;
+    end
+end
+TMesh1 = abs(TMesh);
+%recycled some of the example code
+contourf(X,Y,TMesh1)
+
+colorbar
+
+%contour looks ok,but heat might be flowing in the wring direction
+%change the sign for heat flow on the right face of the figure
+%^this should affect values for T1, T4, T7
+
+
+ 
