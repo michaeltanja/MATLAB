@@ -26,7 +26,7 @@ nNodes = NperRow * NperCol;
 
 k  = 250;       %conduction coefficient
 h  = 250;       %convection coefficient
-Tinf = 0;       %fluid temp in celsius
+Tinf = 273;       %fluid temp in celsius
 
 
 
@@ -63,7 +63,7 @@ for ii = (NperRow*NperCol)-(NperRow - 2) : (NperRow^2 -1) %generalized
     A(ii, ii-NperRow) = 2;                                %lower
     A(ii, ii+1) = 1;                                      %right 
     A(ii, ii-1) = 1;                                      %left
-    A(ii, ii) = (-2)*(((h*dx)/k) + 2);                    %center
+    A(ii, ii) = (-4-((2*h*dx)/k));                    %center
     b(ii) = -(2*h*dx*Tinf)/k;                              %boundary
 end
 
@@ -76,8 +76,8 @@ for ii = (NperCol*NperRow)-(NperRow-1)     %generalized
     A(ii, ii-NperRow) = 1;                 %lower
     A(ii, ii+1) = 1;                       %right 
                                            %no left term
-    A(ii,ii) = (-1)*(((h*dx)/k) +2);       %center
-    b(ii) = -(((h*dx*Tinf)/k) + ((qy*dx)/k)); %boundary
+    A(ii,ii) = (-2-((2*h*dx)/k));       %center
+    b(ii) = -(((2*h*dx*Tinf)/k) +((2*qy*dx)/k)); %boundary
                        %EDIT: change flow of heat on boundary condition
 end
 
@@ -89,7 +89,7 @@ for ii = NperRow*NperCol
     A(ii, ii-NperRow) = 1;           %lower term
                                      %no right term
     A(ii, ii-1) = 1;                 %left
-    A(ii, ii) = ((-2*h*dx)/(k)) - 1; %center
+    A(ii, ii) = (-(2*h*dx)/(k)) - 2; %center
     b(ii) = -(2*h*dx*Tinf)/k;              %boundary
 end
 
