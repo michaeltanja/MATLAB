@@ -1,0 +1,28 @@
+% variables and velocoty plot for active damper
+% all are in English Units
+clear all
+clc
+close all
+
+Jmotor = 0.0019; %sec polar inertia
+Ra = 0.7;        %thev res of armature
+Kt = 2.0336e5;    %compliance of shaft
+rp = 0.75;        %radius of pin
+mc = 1;           %mass cart C
+mb = 1;           %mass cart B
+ma = 1;           %mass cart A
+Kb = 2.284;       %spring constant lbf/in
+Ka = 2.284;       %spring constant lbf/in
+La = 1;           %inductance of motor
+
+endTime = 20;
+sampTime = 0.02;
+
+sim('Active_Damping', endTime)
+
+figure(1)
+clf
+plot(time,Vb)
+title('Velocity on cart B as a function of time')
+xlabel('Time (s)')
+ylabel('Velocity in/s')
