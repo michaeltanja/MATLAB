@@ -33,6 +33,7 @@ endtime = input('how long should the simulation run?               : ');        
 Tcol    = endtime/dt;              % number of temperature colloms
 T       = zeros(nNodes,Tcol);      % initializing Temperature %Tcol
 T(:,1)  = 400*ones(1, nNodes);     % setting initial condition to Temperature = 400 at Time = 0
+
 % got rid of ro and cp
 a       = 1e-4;                    % thermal diffusivity
 Fo      = (a*dt)/(dx*dx);          %Fourier
@@ -51,12 +52,12 @@ for t = 1:dt:endtime
 for ii = NperRow+2 : ((2*NperRow-1))
     for jj = ii:NperRow:nNodes-(NperRow+1)%NperRow+2 : (NperRow^2) - (NperRow+1) %put this first in order, matlab reads top down
     
-    C(jj, jj+NperRow) = Fo;      % upper
-    C(jj, jj-NperRow) = Fo;      % lower
-    C(jj, jj+1)       = Fo;      % right
-    C(jj, jj-1)       = Fo;      % left
+    C(jj, jj+NperRow) = Fo;         % upper
+    C(jj, jj-NperRow) = Fo;         % lower
+    C(jj, jj+1)       = Fo;         % right
+    C(jj, jj-1)       = Fo;         % left
     C(jj, jj)         = (1-(4*Fo)); % center
-    b(jj)             = 0;       % boundary
+    b(jj)             = 0;          % boundary
     end
 end
 
@@ -67,12 +68,12 @@ for ii = 2*NperRow : NperRow : (NperRow^2) - NperRow              %needs to be m
     
     jj = ii;
     
-    C(ii, jj+NperRow) = Fo;                      % upper
-    C(ii, jj-NperRow) = Fo;                      % lower
-                                                   % no right
-    C(ii, jj-1)       = 2*Fo;                        % left
+    C(ii, jj+NperRow) = Fo;                           % upper
+    C(ii, jj-NperRow) = Fo;                           % lower
+                                                      % no right
+    C(ii, jj-1)       = 2*Fo;                         % left
     C(ii, jj)         = (((-2*Fo*h*dx)/k)+(-4*Fo)+1); % center
-    b(ii)             = ((2*Fo*h*dx*Tinf)/k);       % boundary
+    b(ii)             = ((2*Fo*h*dx*Tinf)/k);         % boundary
     
 end
 
@@ -81,12 +82,12 @@ end
 for ii = (nNodes )-(NperRow - 2) : (nNodes -1) %generalized
     
     jj = ii;
-                                                     % no top term
-    C(ii, jj-NperRow) = 2*Fo;                          % lower
-    C(ii, jj+1)       = Fo;                        % right 
-    C(ii, jj-1)       = Fo;                        % left
+                                                          % no top term
+    C(ii, jj-NperRow) = 2*Fo;                             % lower
+    C(ii, jj+1)       = Fo;                               % right 
+    C(ii, jj-1)       = Fo;                               % left
     C(ii, jj)         = (-4*Fo)+((-2*Fo*h*dx)/(k)) + 1;   % center
-    b(ii)             = (2*Fo*h*dx*Tinf)/(k);         % boundary
+    b(ii)             = (2*Fo*h*dx*Tinf)/(k);             % boundary
 end
 
 %starting corners 1-4
@@ -96,12 +97,13 @@ end
 for ii = (NperCol*NperRow)-(NperRow-1)     %generalized
     
     jj = ii;
-                                                  % no top term 
-    C(ii, jj-NperRow) = 2*Fo;                     % lower
-    C(ii, jj+1)       = 2*Fo;                     % right 
-                                                  % no left term
-    C(ii,jj)          = ((-4*Fo) + ((-2*Fo*h*dx)/k) + 1);  % center
-    b(ii)             = (((2*Fo*qy*dx)/k)+((2*Fo*h*dx*Tinf)/k));         % boundary
+                                                                  % no top term 
+    C(ii, jj-NperRow) = 2*Fo;                                     % lower
+    C(ii, jj+1)       = 2*Fo;                                     % right 
+                                                                  % no left term
+    C(ii,jj)          = ((-4*Fo) + ((-2*Fo*h*dx)/k) + 1);         % center
+    b(ii)             = (((2*Fo*qy*dx)/k)+((2*Fo*h*dx*Tinf)/k));  % boundary
+    
                        %EDIT: change flow of heat on boundary condition
 end
 
@@ -111,12 +113,12 @@ end
 for ii = nNodes
     
     jj = ii;
-                                                       % no top term
-    C(ii, jj-NperRow) = 2*Fo;                          % lower term
-                                                       % no right term
-    C(ii, jj-1)       = 2*Fo;                          % left
+                                                          % no top term
+    C(ii, jj-NperRow) = 2*Fo;                             % lower term
+                                                          % no right term
+    C(ii, jj-1)       = 2*Fo;                             % left
     C(ii, jj)         = ((-4*Fo*h*dx)/(k)) + (-4*Fo) + 1; % center
-    b(ii)             = (-4*Fo*h*dx*Tinf)/k;            % boundary
+    b(ii)             = (-4*Fo*h*dx*Tinf)/k;              % boundary
 end
 
 %%
@@ -126,12 +128,13 @@ for ii = 1
     
     jj = ii;
     
-    C(ii, jj+NperRow) = 2*Fo;             % upper
-                                          % no lower
-    C(ii, jj+1)       = 2*Fo;             % right
-                                          % no left term
-    C(ii, jj)         = (-4*Fo) + 1;        % center
+    C(ii, jj+NperRow) = 2*Fo;                     % upper
+                                                  % no lower
+    C(ii, jj+1)       = 2*Fo;                     % right
+                                                  % no left term
+    C(ii, jj)         = (-4*Fo) + 1;              % center
     b(ii)             = (((2*Fo*dx)/k)*(qx+qy));  % boundary
+    
                %EDIT: Changed flow of heat on the boundary condition
 end
 
@@ -142,12 +145,12 @@ for ii = NperRow
     
     jj = ii;
     
-    C(ii, jj+NperRow) = 2*Fo;                     % upper
-                                                  % no lower term
-                                                  % no right term
-    C(ii, jj-1)       = 2*Fo;                     % left term
-    C(ii,jj)          = (-4*Fo)+((-2*Fo*h*dx)/k) + 1;  % center
-    b(ii)             = (((2*Fo*qx*dx)+(2*Fo*h*dx*Tinf))/k);         % boundary
+    C(ii, jj+NperRow) = 2*Fo;                                 % upper
+                                                              % no lower term
+                                                              % no right term
+    C(ii, jj-1)       = 2*Fo;                                 % left term
+    C(ii,jj)          = (-4*Fo)+((-2*Fo*h*dx)/k) + 1;         % center
+    b(ii)             = (((2*Fo*qx*dx)+(2*Fo*h*dx*Tinf))/k);  % boundary
 end
 
 %corners are finished
@@ -155,16 +158,17 @@ end
 %%
 %heat source left side
 
-for ii = NperRow+1 : NperRow : (nNodes)-(NperRow+1)                 %try to generalize for all matrices
+for ii = NperRow+1 : NperRow : (nNodes)-(NperRow+1)           %try to generalize for all matrices
     
     jj = ii;
     
     C(ii, jj+NperRow) = Fo;                % upper
     C(ii, jj-NperRow) = Fo;                % lower
-    C(ii, jj+1)       = 2*Fo;                  % right
-                                             % no left term
-    C(ii, jj)         = ((-4*Fo) + 1);           % center
-    b(ii)             = (2*Fo*qy*dx)/k;     % boundary
+    C(ii, jj+1)       = 2*Fo;              % right
+                                           % no left term
+    C(ii, jj)         = ((-4*Fo) + 1);     % center
+    b(ii)             = (2*Fo*qy*dx)/k;    % boundary
+    
              %EDIT: Changed flow of heat on the boundary condition, for qy
 end
 
@@ -175,11 +179,11 @@ for ii = 2: (NperRow-1)   % generalized
     
     jj = ii;
     
-    C(ii, jj+NperRow) = 2*Fo;             % upper
-                                        % no lower term
-    C(ii, jj+1)       = Fo;           % right term
-    C(ii, jj-1)       = Fo;           % left term
-    C(ii, jj)         =(-4*Fo) + 1;       % center
+    C(ii, jj+NperRow) = 2*Fo;            % upper
+                                         % no lower term
+    C(ii, jj+1)       = Fo;              % right term
+    C(ii, jj-1)       = Fo;              % left term
+    C(ii, jj)         =(-4*Fo) + 1;      % center
     b(ii)             = (2*Fo*qx*dx)/k;  % boundary
 end
 
@@ -187,7 +191,7 @@ end
 % here we are goint to actualy solve for future T
 
 T(:,i+1) = C*(T(:,i))+ b;
-i = i+1;
+i        = i+1;
 
 end
 
