@@ -28,8 +28,8 @@ k       = 250;                     % conduction coefficient
 h       = 250;                     % convection coefficient
 Tinf    = 0;                       % fluid temp in celsius
 
-dt      = 20;                      % delta t
-endtime = 50000;                      % setting end time
+dt      = input('what is the dt?                                   : ');                      % delta t
+endtime = input('how long should the simulation run?               : ');                      % setting end time
 Tcol    = endtime/dt;              % number of temperature colloms
 T       = zeros(nNodes,Tcol);      % initializing Temperature %Tcol
 T(:,1)  = 400*ones(1, nNodes);     % setting initial condition to Temperature = 400 at Time = 0
