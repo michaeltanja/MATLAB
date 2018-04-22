@@ -191,7 +191,7 @@ end
 % here we are goint to actualy solve for future T
 
 K        = inv(C);
-T(:,i+1) = k*T(:,i)+ K*b;
+T(:,i+1) = K*T(:,i)+ K*b;
 i        = i+1;
 
 end
