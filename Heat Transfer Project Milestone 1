@@ -29,7 +29,6 @@ h  = 250;       %convection coefficient
 Tinf = 0;       %fluid temp in celsius
 
 
-
 %next in line is node set up
 %% 
 % Center Node/s
@@ -180,10 +179,12 @@ for aa = 1:NperRow %nNodes/NperRow
 end
 %TMesh1 = abs(TMesh);
 %recycled some of the example code
+z = length(x);
 contourf(X,Y,TMesh)
-
+%plot(x,TMesh((z+1)/2, :))
+%plot(y,TMesh(:,(z+1)/2))
 colorbar
-
+title('Contour plot of temperature distribution(C) as a function of position(m)')
 %contour looks ok,but heat might be flowing in the wring direction
 %change the sign for heat flow on the right face of the figure
 %^this should affect values for T1, T4, T7
