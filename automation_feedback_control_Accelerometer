@@ -1,0 +1,166 @@
+#include <Wire.h>
+
+int m; //mass of the accelerometer assembly and the arduino attached
+
+long accelX, accelY, accelZ;
+float gForceX, gForceY,gForceZ;
+
+float linaccelX;
+
+long gyroX, gyroY, gyroZ;
+float rotX, rotY, rotZ;
+
+
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();
+  setupMPU();
+
+}
+
+void loop() {
+  recordAccelRegisters();
+  recordGyroRegisters();
+  printData();
+  delay(500);
+
+}
+
+void setupMPU(){
+  Wire.beginTransmission(0b1101000);
+
+
+  Wire.write(0x6B);
+
+
+  Wire.write(0b00000000);
+
+
+  Wire.endTransmission();
+
+
+  Wire.beginTransmission(0b1101000);
+
+
+  Wire.write(0x1B);
+
+
+  Wire.write(0x00000000);
+
+
+  Wire.endTransmission();
+
+
+  Wire.beginTransmission(0b1101000);
+
+
+  Wire.write(0x1C);
+
+
+  Wire.write(0b00000000);
+
+
+  Wire.endTransmission();
+
+  
+}
+
+void recordAccelRegisters(){
+  Wire.beginTransmission(0b1101000);
+
+
+  Wire.write(0x3B); 
+
+
+  Wire.endTransmission();
+
+
+  Wire.requestFrom(0b1101000,6);
+
+
+  while(Wire.available() < 6);
+
+
+  accelX = Wire.read()<<8|Wire.read();
+
+
+  accelY = Wire.read()<<8|Wire.read();
+
+
+  accelZ = Wire.read()<<8|Wire.read();
+
+
+  processAccelData();
+
+  
+}
+
+void processAccelData(){
+  gForceX = (accelX / 16384.0) + (-1.32); //should be about 0 with no movement
+  gForceY = (accelY / 16384.0) + (-0.26); //should be about 0 with no movement
+  gForceZ = (accelZ / 16834.0) + (0.22); //should be about 1 with no movement, gravity of earth
+
+  linaccelX = 9.81 * gForceX; //1 G = 9.81 m/s^2 or 32ft/s^2
+  
+}
+
+void recordGyroRegisters(){
+  Wire.beginTransmission(0b1101000);
+
+
+  Wire.write(0x43);
+
+
+  Wire.endTransmission();
+
+
+  Wire.requestFrom(0b1101000,6);
+
+
+  while(Wire.available() < 6);
+
+
+  gyroX = Wire.read()<<8|Wire.read();
+
+
+  gyroY = Wire.read()<<8|Wire.read();
+
+  gyroZ = Wire.read()<<8|Wire.read();
+
+
+  processGyroData();
+
+  
+}
+
+void processGyroData(){
+  rotX = gyroX / 131.0;
+  rotY = gyroY / 131.0;
+  rotZ = gyroZ / 131.0;
+}
+
+void printData(){
+//  Serial.print("Gyro (deg)");
+//  Serial.print(" X=");
+//  Serial.print(rotX);
+//  Serial.print(" Y=");
+//  Serial.print(rotY);
+//  Serial.print(" Z=");
+//  Serial.print(rotZ);
+  //Serial.print(" | Accel(g)");
+  //Serial.print(" X=");
+  Serial.print("Acceleration in G's: ");
+  Serial.println(gForceX);
+  Serial.print("Acceleration in m/s^2: ");
+  Serial.println(linaccelX);
+//  Serial.print(" Y=");
+//  Serial.print(gForceY);
+//  Serial.print(" Z=");
+//  Serial.println(gForceZ);
+  
+}
+
+
+//convert g's to acceleration n m/s^2
+//use this to calculate velocity
+//comment oall the wire transmissions on the 
